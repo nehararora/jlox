@@ -51,6 +51,7 @@ public class Scanner {
 
     /**
      * All the lexemes
+     *
      */
     private void scanToken() {
 
@@ -70,18 +71,22 @@ public class Scanner {
                 addToken(match('=') ? TokenType.BANG_EQUAL: TokenType.BANG);
                 break;
             case '=':
-                addToken( match('=') ? TokenType.EQUAL_EQUAL: TokenType.EQUAL);
+                addToken(match('=') ? TokenType.EQUAL_EQUAL: TokenType.EQUAL);
                 break;
             case '<':
-                addToken( match('=') ? TokenType.LESS_EQUAL: TokenType.LESS);
+                addToken(match('=') ? TokenType.LESS_EQUAL: TokenType.LESS);
                 break;
             case '>':
-                addToken( match('=') ? TokenType.GREATER_EQUAL: TokenType.GREATER);
+                addToken(match('=') ? TokenType.GREATER_EQUAL: TokenType.GREATER);
                 break;
             case '/':
-                if ( match('/') ) {
+                if (match('/')) {
                     //comment
                     while (peek() != '\n' && !isAtEnd()) advance();
+                } else if (match('*')) {
+                    // multi-line comment start
+                    while (peek() != '*' && peekNext() != '/' && !isAtEnd()) advance();
+
                 } else {
                     addToken(TokenType.SLASH);
                 }
@@ -122,7 +127,7 @@ public class Scanner {
      */
     private char peek() {
         // lookahead
-        if ( isAtEnd() ) return '\0';
+        if (isAtEnd()) return '\0';
         return source.charAt(current);
     }
 
@@ -136,7 +141,6 @@ public class Scanner {
         return source.charAt(current + 1);
     }
 
-
     private void addToken(TokenType type) {
         addToken(type, null);
     }
@@ -149,14 +153,14 @@ public class Scanner {
     private boolean match(char expected) {
         if(isAtEnd()) return false;
 
-        if ( source.charAt(current) != expected ) return false;
+        if (source.charAt(current) != expected) return false;
 
         current ++;
         return true;
     }
 
     private void string(){
-        while ( peek() != '"' && !isAtEnd() ) {
+        while (peek() != '"' && !isAtEnd()) {
             if (peek() == '\n') line++;
             advance();
         }
