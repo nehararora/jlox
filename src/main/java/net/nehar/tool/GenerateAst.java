@@ -7,6 +7,9 @@ import java.util.List;
 
 
 public class GenerateAst {
+    private static final String packageName = "net.nehar.lox";
+    private static final String className = "Expr";
+
     public static void main(String [] args) throws IOException {
         if (args.length != 1) {
             System.err.println("Usage: generate_ast: <output directory>");
@@ -14,11 +17,11 @@ public class GenerateAst {
         }
 
         String outputDir = args[0];
-        defineAst(outputDir, "Expr", Arrays.asList(
-                "Binary: Expr Left, Token Operator, Expr Right",
-                "Grouping: Expr Expression",
+        defineAst(outputDir, className, Arrays.asList(
+                "Binary: Expr left, Token operator, Expr right",
+                "Grouping: Expr expression",
                 "Literal: Object value",
-                "Unary: Token Operator, Expr right"
+                "Unary: Token operator, Expr right"
         ));
     }  //  end main
 
@@ -27,21 +30,41 @@ public class GenerateAst {
                                   List<String> types) throws IOException {
 
         String path = outputDir + "/" + baseName + ".java";
-        PrintWriter writer = new PrintWriter("UTF-8");
-        writer.println("package net.nehar.lox");
+        PrintWriter writer = new PrintWriter(path, "UTF-8");
+
+        writer.println("package " + packageName + ";");
         writer.println();
-        writer.println("import java.util.list");
+        writer.println("import java.util.List;");
         writer.println();
         writer.println("abstract class " + baseName + " {");
 
+        defineVisitor(writer, baseName, types);
+
         for (String type: types) {
             String className = type.split(":")[0].trim();
-            String fields = type.split(":")[0].trim();
+            String fields = type.split(":")[1].trim();
             defineType(writer, baseName, className, fields);
         }
-        writer.println("}");
+
+        writer.println();
+        writer.println("    abstract <R> R accept(Visitor<R> visitor);");
+        writer.println("\n}  //  end abstract class " + baseName);
         writer.close();
     }  //  end defineAst
+
+    private static void defineVisitor(PrintWriter writer,
+                                      String baseName,
+                                      List<String> types) {
+        writer.println("    interface Visitor<R> {");
+
+        for (String type: types) {
+            String typeName = type.split(":")[0].trim();
+            writer.println("        R visit" + typeName + baseName + "(" +
+                   typeName +" " + baseName.toLowerCase() + ");");
+        }
+
+        writer.println("    }  //  end interface Visitor");
+    }  //  end defineVisitor
 
     private static void defineType(PrintWriter writer,
                                    String baseName,
@@ -49,27 +72,35 @@ public class GenerateAst {
                                    String fieldList) {
 
         //  class header
-        writer.println(" Static Class " + className + " extends " + baseName + " {");
+        writer.println("\n    static class " + className + " extends " + baseName + " {");
 
         // constructor
-        writer.println("    " + className + " extends " + baseName + " {");
+        writer.println("        " + className + "(" + fieldList + ") {");
 
         // parameters/fields
         String []fields = fieldList.split(", ");
 
         for (String field: fields) {
             String name = field.split(" ")[1];
-            writer.println("    this." + name + " = " + name + ";");
+            writer.println("            this." + name + " = " + name + ";");
         }
-        writer.println("    }");
+        writer.println("        } //  end constructor");
 
-        //fields
+        // Visitor
+        writer.println();
+        writer.println("        @Override");
+        writer.println("        <R> R accept(Visitor<R> visitor) {");
+        writer.println("            return visitor.visit" +
+                className + baseName + "(this);");
+        writer.println("        }");
+
+        // fields
         writer.println();
         for (String field: fields) {
-            writer.println("    final " + field + ";");
+            writer.println("        final " + field + ";");
         }
 
-        writer.println("    }");
+        writer.println("    }  //  end class " + className);
     }  //  end method defineType
 
 }  //  end class GenerateAst
