@@ -27,6 +27,13 @@ public class Parser {
         this.tokens = tokens;
     }  //  end constructor
 
+    Expr parse() {
+        try {
+            return expression();
+        } catch (ParseError error) {
+            return null;
+        }
+    }  //  end method parse
     private Expr expression() {
         return equality();
     }  //  end method expression
@@ -146,4 +153,16 @@ public class Parser {
         return new ParseError();
     }  //  end method error
 
+    private void synchronize() {
+        advance();
+
+        while (!isAtEnd()) {
+            if (previous().type == TokenType.SEMICOLON) return;
+
+            switch (peek().type) {
+                case CLASS, FUN, VAR, FOR, IF, WHILE, PRINT, RETURN -> { return; }
+                default -> advance();
+            }
+        }
+    }
 }  //  end class Parser
