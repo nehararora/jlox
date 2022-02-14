@@ -10,7 +10,10 @@ import java.util.List;
 
 public class Lox {
 
+    private static final Interpreter interpreter = new Interpreter();
+
     static boolean hadError = false;
+    static boolean hadRuntimeError = false;
 
     public static void main(String [] args) throws IOException {
         if( args.length > 1 ){
@@ -27,6 +30,7 @@ public class Lox {
         byte[] bytes = Files.readAllBytes(Paths.get(path));
         run(new String(bytes, Charset.defaultCharset()));
         if(hadError) System.exit(65);
+        if(hadRuntimeError) System.exit(70);
 
     }  //  end runFile
 
@@ -56,7 +60,8 @@ public class Lox {
         //error!
         if (hadError) return;
 
-        System.out.println(new AstPrinter().print(expression));
+        interpreter.interpret(expression);
+
     }  // end run
 
     static void error(int line, String message) {
@@ -70,6 +75,11 @@ public class Lox {
             report(token.line, " at '" + token.lexeme +",", message);
         }
     }  //  end error(token, message)
+
+    static void runtimeError(RuntimeError error) {
+        System.err.println(error.getMessage() + "\n[line " + error.token.line + "]");
+        hadRuntimeError = true;
+    }  //  end method runtimeError
 
     private static void report(int line, String where,
                                String message) {
