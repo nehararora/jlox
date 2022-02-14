@@ -57,7 +57,15 @@ public class Lox {
 
     static void error(int line, String message) {
         report(line, "", message);
-    }  // end error
+    }  // end error(line, message)
+
+    static void error(Token token, String message) {
+        if (token.type == TokenType.EOF) {
+            report(token.line, "at end", message);
+        } else {
+            report(token.line, " at '" + token.lexeme +",", message);
+        }
+    }  //  end error(token, message)
 
     private static void report(int line, String where,
                                String message) {
