@@ -1,6 +1,5 @@
 package net.nehar.lox;
 
-import java.util.List;
 
 abstract class Expr {
     interface Visitor<R> {
