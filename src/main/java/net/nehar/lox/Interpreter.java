@@ -1,15 +1,23 @@
 package net.nehar.lox;
 
-public class Interpreter implements Expr.Visitor<Object> {
+import java.util.List;
 
-    void interpret(Expr expression) {
+
+public class Interpreter implements
+        Expr.Visitor<Object>, Stmt.Visitor<Void> {
+
+    void interpret(List<Stmt> statements) {
         try {
-            Object value = evaluate(expression);
-            System.out.println(stringify(value));
+            for (Stmt statement: statements)
+                execute(statement);
         } catch (RuntimeError error) {
             Lox.runtimeError(error);
         }
     }  //  end method interpret
+
+    private void execute(Stmt statement) {
+        statement.accept(this);
+    }  //  end method execute
 
     @Override
     public Object visitLiteralExpr(Expr.Literal expr) {
@@ -88,6 +96,19 @@ public class Interpreter implements Expr.Visitor<Object> {
     private Object evaluate(Expr expr) {
         return expr.accept(this);
     }  //  end method evaluate
+
+    @Override
+    public Void visitExpressionStmt(Stmt.Expression stmt) {
+        evaluate(stmt.expression);
+        return null;
+    }  //  end method visitExpressionStmt
+
+    @Override
+    public Void visitPrintStmt(Stmt.Print stmt) {
+        Object value = evaluate(stmt.expression);
+        System.out.println(stringify(value));
+        return null;
+    }  //  end method visitPrintStmt
 
     private boolean isTruthy(Object object) {
         if (object == null) return false;

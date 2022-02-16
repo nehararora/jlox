@@ -1,5 +1,6 @@
 package net.nehar.lox;
 
+import java.util.List;
 
 abstract class Expr {
     interface Visitor<R> {
@@ -7,6 +8,7 @@ abstract class Expr {
         R visitGroupingExpr(Grouping expr);
         R visitLiteralExpr(Literal expr);
         R visitUnaryExpr(Unary expr);
+        R visitVariableExpr(Variable expr);
     }  //  end interface Visitor
 
     static class Binary extends Expr {
@@ -66,6 +68,19 @@ abstract class Expr {
         final Token operator;
         final Expr right;
     }  //  end class Unary
+
+    static class Variable extends Expr {
+        Variable(Token name) {
+            this.name = name;
+        } //  end constructor
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitVariableExpr(this);
+        }
+
+        final Token name;
+    }  //  end class Variable
 
     abstract <R> R accept(Visitor<R> visitor);
 
