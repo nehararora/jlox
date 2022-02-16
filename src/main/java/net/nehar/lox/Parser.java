@@ -7,7 +7,9 @@ import java.util.List;
  * The frickin' parser.
  * Grammar:
  *
- * program        → statement* EOF ;
+ * program        → declaration* EOF ;
+ * declaration    → varDecl | statement ;
+ * varDecl        → "var" IDENTIFIER ("=" expression)? ";";
  * statement      → exprStmt | printStmt ;
  * exprStmt       → expression ";" ;
  * printStmt      → "print" expression ";" ;
@@ -19,7 +21,7 @@ import java.util.List;
  * unary          → ( "!" | "-" ) unary
  *                | primary ;
  * primary        → NUMBER | STRING | "true" | "false" | "nil"
- *                | "(" expression ")" ;
+ *                | "(" expression ")" | IDENTIFIER ;
  *
  */
 public class Parser {
