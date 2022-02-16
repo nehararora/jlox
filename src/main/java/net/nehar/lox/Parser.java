@@ -38,7 +38,7 @@ public class Parser {
     List<Stmt> parse() {
         List<Stmt> statements = new ArrayList<>();
         while( !isAtEnd()) {
-            statements.add(statement());
+            statements.add(declaration());
         }
         return statements;
     }  //  end method parse
@@ -55,6 +55,10 @@ public class Parser {
         return new Stmt.Print(value);
     }
 
+    private Stmt varDeclaration() {
+
+    }
+
     private Stmt expressionStatement() {
         Expr expr = expression();
         consume(TokenType.SEMICOLON, "Expect ';' after expression");
@@ -64,6 +68,18 @@ public class Parser {
     private Expr expression() {
         return equality();
     }  //  end method expression
+
+    private Stmt declaration() {
+        try {
+            if (match(TokenType.VAR)) return varDeclaration();
+
+            return statement();
+        } catch (ParseError error) {
+            synchronize();
+            return null;
+        }
+
+    }  //  end method declaration
 
     private Expr equality() {
         Expr expr = comparison();
