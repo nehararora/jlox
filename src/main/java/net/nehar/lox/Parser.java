@@ -56,8 +56,13 @@ public class Parser {
     }
 
     private Stmt varDeclaration() {
+        Token name = consume(TokenType.IDENTIFIER, "Expect variable name.");
 
-    }
+        Expr initializer = match(TokenType.EQUAL) ? expression(): null;
+
+        consume(TokenType.SEMICOLON, "Expect ';' after variable declaration.");
+        return new Stmt.Var(name, initializer);
+    }  //  end method varDeclaration
 
     private Stmt expressionStatement() {
         Expr expr = expression();
@@ -143,6 +148,9 @@ public class Parser {
                 TokenType.STRING)) {
             return new Expr.Literal(previous().literal);
         }
+
+        if(match(TokenType.IDENTIFIER))
+            return new Expr.Variable(previous());
 
         if(match(TokenType.LEFT_PAREN)) {
             Expr expr = expression();
