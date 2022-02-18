@@ -17,7 +17,7 @@ public class Environment {
         if(values.containsKey(name.lexeme))
             return values.get(name.lexeme);
 
-        throw new RuntimeError(name, "Undefined variable " + name.lexeme + ".")
+        throw new RuntimeError(name, "Undefined variable " + name.lexeme + ".");
     }  //  end method get
 
 }  //  end class Environment
