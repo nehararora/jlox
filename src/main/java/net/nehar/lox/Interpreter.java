@@ -47,6 +47,11 @@ public class Interpreter implements
     }  //  end method visitUnaryExpr
 
     @Override
+    public Object visitVariableExpr(Expr.Variable expr) {
+        return environment.get(expr.name);
+    }  //  end method visitVariableExpr
+
+    @Override
     public Object visitBinaryExpr(Expr.Binary expr) {
         Object left = evaluate(expr.left);
         Object right = evaluate(expr.right);
@@ -111,6 +116,22 @@ public class Interpreter implements
         System.out.println(stringify(value));
         return null;
     }  //  end method visitPrintStmt
+
+    @Override
+    public Void visitVarStmt(Stmt.Var stmt) {
+
+        Object value = (stmt.initializer != null) ? evaluate(stmt.initializer):null;
+        environment.define(stmt.name.lexeme, value);
+
+        return null;
+    }  //  end method visitVarStmt
+
+    @Override
+    public Object visitAssignExpr(Expr.Assign expr) {
+        Object value = evaluate(expr.value);
+        environment.assign(expr.name, value);
+        return value;
+    }  //  end method visitAssignExpr
 
     private boolean isTruthy(Object object) {
         if (object == null) return false;
