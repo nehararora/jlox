@@ -22,6 +22,24 @@ public class Interpreter implements
     }  //  end method execute
 
     @Override
+    public Void visitBlockStmt(Stmt.Block stmt) {
+        executeBlock(stmt.statements, new Environment(environment));
+        return null;
+    }  //  end method visitBlockStmt
+
+    void executeBlock(List<Stmt> statements, Environment environment) {
+        Environment previous = this.environment;
+
+        try {
+            this.environment = environment;
+            for (Stmt statement : statements) {
+                execute(statement);
+            }
+        } finally {
+            this.environment = previous;
+        }
+    }  //  end method executeBlock
+    @Override
     public Object visitLiteralExpr(Expr.Literal expr) {
         return expr.value;
     }  //  end method visitLiteralExpr
