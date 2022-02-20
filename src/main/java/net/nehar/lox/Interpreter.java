@@ -131,6 +131,16 @@ public class Interpreter implements
     }  //  end method visitExpressionStmt
 
     @Override
+    public Void visitIfStmt(Stmt.If stmt) {
+        if (isTruthy(evaluate(stmt.condition)))
+            execute(stmt.thenBranch);
+        else if (stmt.elseBranch != null)
+            execute(stmt.elseBranch);
+
+        return null;
+    }  //  end method visitIfStmt
+
+    @Override
     public Void visitPrintStmt(Stmt.Print stmt) {
         Object value = evaluate(stmt.expression);
         System.out.println(stringify(value));
