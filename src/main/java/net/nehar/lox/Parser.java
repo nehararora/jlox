@@ -16,7 +16,9 @@ import java.util.List;
  * printStmt      → "print" expression ";" ;
  * block          → "{" declaration* "}" ;
  * expression     → assignment ;
- * assignment     → IDENTIFIER "=" assignment | equality ;
+ * assignment     → IDENTIFIER "=" assignment | equality | logic_or;
+ * logic_or       → logic_and ("or" logic_and)*;
+ * logic_and      → equality ("and" equality)*;
  * equality       → comparison ( ( "!=" | "==" ) comparison )* ;
  * comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
  * term           → factor ( ( "-" | "+" ) factor )* ;
@@ -106,7 +108,7 @@ public class Parser {
     }  //  end method expression
 
     private Expr assignment() {
-        Expr expr = equality();
+        Expr expr = or();
 
         if (match(TokenType.EQUAL)) {
             Token equals = previous();
@@ -121,6 +123,30 @@ public class Parser {
         }  //  end if match(Equal)
         return expr;
     }  //  end method assign
+
+    private Expr or() {
+        Expr expr = and();
+
+        while (match(TokenType.OR)) {
+            Token operator = previous();
+            Expr right = and();
+            expr = new Expr.Logical(expr, operator, right);
+        }
+
+        return expr;
+    }  //  end method or
+
+    private Expr and() {
+        Expr expr = equality();
+
+        while(match(TokenType.AND)) {
+            Token operator = previous();
+            Expr right = equality();
+            expr = new Expr.Logical(expr, operator, right);
+        }
+
+        return expr;
+    }  //  end method and
 
     private Stmt declaration() {
         try {
