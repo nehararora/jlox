@@ -39,6 +39,7 @@ public class Interpreter implements
             this.environment = previous;
         }
     }  //  end method executeBlock
+
     @Override
     public Object visitLiteralExpr(Expr.Literal expr) {
         return expr.value;
@@ -92,6 +93,7 @@ public class Interpreter implements
                 yield (double)left <= (double)right;
             }
             case BANG_EQUAL -> !isEqual(left, right);
+            case EQUAL_EQUAL -> isEqual(left, right);
             case MINUS -> {
                 checkNumberOperands(expr.operator, left, right);
                 yield (double)left - (double) right;
