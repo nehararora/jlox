@@ -161,6 +161,14 @@ public class Interpreter implements
     }  //  end method visitPrintStmt
 
     @Override
+    public Void visitWhileStmt(Stmt.While stmt) {
+        while(isTruthy(evaluate(stmt.condition))) {
+            execute(stmt.body);
+        }
+        return null;
+    }  //  en method visitWhileStmt
+
+    @Override
     public Void visitVarStmt(Stmt.Var stmt) {
 
         Object value = (stmt.initializer != null) ? evaluate(stmt.initializer):null;

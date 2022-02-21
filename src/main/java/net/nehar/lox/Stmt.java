@@ -9,6 +9,7 @@ abstract class Stmt {
         R visitIfStmt(If stmt);
         R visitPrintStmt(Print stmt);
         R visitVarStmt(Var stmt);
+        R visitWhileStmt(While stmt);
     }  //  end interface Visitor
 
     static class Block extends Stmt {
@@ -81,6 +82,21 @@ abstract class Stmt {
         final Token name;
         final Expr initializer;
     }  //  end class Var
+
+    static class While extends Stmt {
+        While(Expr condition, Stmt body) {
+            this.condition = condition;
+            this.body = body;
+        } //  end constructor
+
+        @Override
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitWhileStmt(this);
+        }
+
+        final Expr condition;
+        final Stmt body;
+    }  //  end class While
 
     abstract <R> R accept(Visitor<R> visitor);
 

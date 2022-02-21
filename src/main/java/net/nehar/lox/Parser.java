@@ -10,11 +10,12 @@ import java.util.List;
  * program        → declaration* EOF ;
  * declaration    → varDecl | statement ;
  * varDecl        → "var" IDENTIFIER ("=" expression)? ";";
- * statement      → exprStmt | ifStmt | printStmt | block;
+ * statement      → exprStmt | ifStmt | printStmt | whileStmt | block;
  * exprStmt       → expression ";" ;
- * ifStmt         → "if" "(" expression ")" statement ( "else" statement )? ;
+ * ifStmt         → "if" "(" expression ")" statement ( "else" statement )?;
  * printStmt      → "print" expression ";" ;
  * block          → "{" declaration* "}" ;
+ * whileStmt      → "while" "(" expression ")" statement;
  * expression     → assignment ;
  * assignment     → IDENTIFIER "=" assignment | equality | logic_or;
  * logic_or       → logic_and ("or" logic_and)*;
@@ -52,6 +53,7 @@ public class Parser {
 
         if(match(TokenType.IF)) return ifStatement();
         if (match(TokenType.PRINT)) return printStatement();
+        if (match(TokenType.WHILE)) return whileStatement();
         if (match(TokenType.LEFT_BRACE)) return new Stmt.Block(block());
 
         return expressionStatement();
@@ -69,14 +71,21 @@ public class Parser {
         }
 
         return new Stmt.If(condition, thenBranch, elseBranch);
-
     }  //  end method ifStatement
 
     private Stmt printStatement() {
         Expr value = expression();
         consume(TokenType.SEMICOLON, "Expect ';' after value.");
         return new Stmt.Print(value);
-    }
+    }  //  end printStatement
+
+    private Stmt whileStatement() {
+        consume(TokenType.LEFT_PAREN, "Expect '(' after 'while'.");
+        Expr condition = expression();
+        consume(TokenType.RIGHT_PAREN, "Expect ')' after 'while'.");
+        Stmt body = statement();
+        return new Stmt.While(condition, body);
+    }  //  end method  whileStatement
 
     private Stmt varDeclaration() {
         Token name = consume(TokenType.IDENTIFIER, "Expect variable name.");
