@@ -198,6 +198,13 @@ public class Interpreter implements
     }  //  end method visitExpressionStmt
 
     @Override
+    public Void visitFunctionStmt(Stmt.Function stmt) {
+        LoxFunction function = new LoxFunction(stmt);
+        environment.define(stmt.name.lexeme, function);
+        return null;
+    }  //  end method visitFunctionStmt
+
+    @Override
     public Void visitIfStmt(Stmt.If stmt) {
         if (isTruthy(evaluate(stmt.condition)))
             execute(stmt.thenBranch);
