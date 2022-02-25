@@ -222,6 +222,15 @@ public class Interpreter implements
     }  //  end method visitPrintStmt
 
     @Override
+    public void visitReturnStatement(Stmt.Return stmt) {
+        Object value = null;
+
+        if (stmt.value != null) value = evaluate(stmt.value);
+
+        throw new Return(value);
+    }  //  end method visitReturnStatement
+
+    @Override
     public Void visitWhileStmt(Stmt.While stmt) {
         while(isTruthy(evaluate(stmt.condition))) {
             execute(stmt.body);

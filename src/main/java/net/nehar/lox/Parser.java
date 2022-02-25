@@ -15,12 +15,19 @@ import java.util.List;
  * function       → IDENTIFIER "(" parameters? ")" block ;
  * parameters     → IDENTIFIER ( "," IDENTIFIER )* ;
  * varDecl        → "var" IDENTIFIER ("=" expression)? ";";
- * statement      → exprStmt | forStmt | ifStmt | printStmt | whileStmt | block;
+ * statement      → exprStmt
+ *                |  forStmt
+ *                | ifStmt
+ *                | printStmt
+ *                | returnStmt
+ *                | whileStmt
+ *                | block;
  * exprStmt       → expression ";" ;
  * forStmt        → "for" "(" (varDecl | exprStmt | ";" )
  *                  expression? ":" expression? ")" statement;
  * ifStmt         → "if" "(" expression ")" statement ( "else" statement )?;
  * printStmt      → "print" expression ";" ;
+ * returnStmt     → "return" expression? ";" ;
  * block          → "{" declaration* "}" ;
  * whileStmt      → "while" "(" expression ")" statement;
  * expression     → assignment ;
@@ -62,6 +69,7 @@ public class Parser {
         if(match(TokenType.IF)) return ifStatement();
         if(match(TokenType.FOR)) return forStatement();
         if (match(TokenType.PRINT)) return printStatement();
+        if (match(TokenType.RETURN)) return returnStatement();
         if (match(TokenType.WHILE)) return whileStatement();
         if (match(TokenType.LEFT_BRACE)) return new Stmt.Block(block());
 
@@ -127,7 +135,18 @@ public class Parser {
         Expr value = expression();
         consume(TokenType.SEMICOLON, "Expect ';' after value.");
         return new Stmt.Print(value);
-    }  //  end printStatement
+    }  //  end method printStatement
+
+    private Stmt returnStatement() {
+        Token keyword = previous();
+        Expr value = null;
+        if(!check(TokenType.SEMICOLON)) {
+            value = expression();
+        }
+
+        consume(TokenType.SEMICOLON, "Expect ';' after return value.");
+        return new Stmt.Return(keyword, value);
+    }  //  end method returnStatement
 
     private Stmt whileStatement() {
         consume(TokenType.LEFT_PAREN, "Expect '(' after 'while'.");
