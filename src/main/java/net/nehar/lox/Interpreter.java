@@ -222,7 +222,7 @@ public class Interpreter implements
     }  //  end method visitPrintStmt
 
     @Override
-    public void visitReturnStatement(Stmt.Return stmt) {
+    public Void visitReturnStmt(Stmt.Return stmt) {
         Object value = null;
 
         if (stmt.value != null) value = evaluate(stmt.value);

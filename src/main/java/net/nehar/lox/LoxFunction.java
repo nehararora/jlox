@@ -36,7 +36,7 @@ public class LoxFunction implements LoxCallable {
         try {
             interpreter.executeBlock(declaration.body, environment);
         } catch (Return returnValue) {
-            return returnValue;
+            return returnValue.value;
         }
         return null;
     }  //  end method call
