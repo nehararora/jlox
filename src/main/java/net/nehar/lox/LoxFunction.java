@@ -5,8 +5,10 @@ import java.util.List;
 
 public class LoxFunction implements LoxCallable {
     private final Stmt.Function declaration;
+    private final Environment closure;
 
-    LoxFunction(Stmt.Function declaration) {
+    LoxFunction(Stmt.Function declaration, Environment closure) {
+        this.closure = closure;
         this.declaration = declaration;
     }
 
@@ -24,7 +26,7 @@ public class LoxFunction implements LoxCallable {
     public Object call(Interpreter interpreter,
                        List<Object> arguments) {
         // create the new scope
-        Environment environment = new Environment(interpreter.globals);
+        Environment environment = new Environment(closure);
 
         // add arguments to current scope
         for (int i = 0; i < declaration.params.size(); i++) {
